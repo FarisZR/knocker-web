@@ -1,6 +1,8 @@
 import {expect, test} from '@playwright/test'
 
-test('renders knocker web form and performs successful knock', async ({page}) => {
+test('renders knocker web form and performs successful knock', async ({
+	page
+}) => {
 	await page.goto('/')
 
 	// Check that the form is visible
@@ -10,7 +12,9 @@ test('renders knocker web form and performs successful knock', async ({page}) =>
 	await expect(page.getByRole('button', {name: /knock/i})).toBeVisible()
 
 	// Fill in the form
-	await page.getByRole('textbox', {name: /endpoint url/i}).fill('https://knocker.example.com')
+	await page
+		.getByRole('textbox', {name: /endpoint url/i})
+		.fill('https://knocker.example.com')
 	await page.getByRole('textbox', {name: /token/i}).fill('test-token-123')
 	await page.getByRole('spinbutton', {name: /ttl/i}).fill('1800')
 
@@ -27,7 +31,9 @@ test('shows error message on failed knock', async ({page}) => {
 	await page.goto('/')
 
 	// Fill in the form with invalid token
-	await page.getByRole('textbox', {name: /endpoint url/i}).fill('https://knocker.example.com')
+	await page
+		.getByRole('textbox', {name: /endpoint url/i})
+		.fill('https://knocker.example.com')
 	await page.getByRole('textbox', {name: /token/i}).fill('invalid-token')
 
 	// Submit the form

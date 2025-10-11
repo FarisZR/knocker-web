@@ -108,7 +108,7 @@
 			}
 		},
 		{
-			"includes": ["src/**/*.test.tsx", "src/**/*.test.ts"],
+			"includes": ["src/**/*.test.tsx", "src/**/*.test.ts", "tests/**/*.ts"],
 			"linter": {
 				"rules": {
 					"complexity": {
@@ -136,9 +136,6 @@
 				"rules": {
 					"complexity": {
 						"noExcessiveLinesPerFunction": "off"
-					},
-					"correctness": {
-						"useUniqueElementIds": "off"
 					}
 				}
 			}

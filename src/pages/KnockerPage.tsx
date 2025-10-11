@@ -1,5 +1,5 @@
 import {useMutation} from '@tanstack/react-query'
-import {type FormEvent, useEffect, useState} from 'react'
+import {type FormEvent, useEffect, useId, useState} from 'react'
 import {useSearchParams} from 'react-router'
 import {type KnockResponse, knock} from '@/api/knocker'
 import {Head} from '@/components/Head'
@@ -13,6 +13,12 @@ export function KnockerPage() {
 	const [ip, setIp] = useState('')
 	const [result, setResult] = useState<KnockResponse | null>(null)
 	const [requestedTtl, setRequestedTtl] = useState<number | null>(null)
+
+	// Generate unique IDs for form inputs
+	const endpointId = useId()
+	const tokenId = useId()
+	const ttlId = useId()
+	const ipId = useId()
 
 	const knockMutation = useMutation({
 		mutationFn: async () => {
@@ -46,26 +52,26 @@ export function KnockerPage() {
 	})
 
 	// Load session data on mount
-    // Derive autoKnock from the URL so it can be a proper dependency
-    const autoKnock = searchParams.get('autoKnock') === 'true'
+	// Derive autoKnock from the URL so it can be a proper dependency
+	const autoKnock = searchParams.get('autoKnock') === 'true'
 
-    useEffect(() => {
-        const session = loadSession()
-        if (session) {
-            setEndpoint(session.endpoint)
-            setToken(session.token)
-            setTtl(session.ttl ? String(session.ttl) : '')
-            setIp(session.ip || '')
+	useEffect(() => {
+		const session = loadSession()
+		if (session) {
+			setEndpoint(session.endpoint)
+			setToken(session.token)
+			setTtl(session.ttl ? String(session.ttl) : '')
+			setIp(session.ip || '')
 
-            // Auto-knock if query param is present
-            if (autoKnock) {
-                // Use setTimeout to ensure form is fully hydrated
-                setTimeout(() => {
-                    knockMutation.mutate()
-                }, 0)
-            }
-        }
-    }, [autoKnock, knockMutation.mutate])
+			// Auto-knock if query param is present
+			if (autoKnock) {
+				// Use setTimeout to ensure form is fully hydrated
+				setTimeout(() => {
+					knockMutation.mutate()
+				}, 0)
+			}
+		}
+	}, [autoKnock, knockMutation.mutate])
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault()
@@ -91,13 +97,13 @@ export function KnockerPage() {
 						<div>
 							<label
 								className='mb-2 block font-medium text-gray-900 text-sm dark:text-white'
-								htmlFor='endpoint'
+								htmlFor={endpointId}
 							>
 								Knocker Endpoint URL *
 							</label>
 							<input
 								className='w-full rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-								id='endpoint'
+								id={endpointId}
 								onChange={e => setEndpoint(e.target.value)}
 								placeholder='https://knocker.example.com'
 								required={true}
@@ -109,13 +115,13 @@ export function KnockerPage() {
 						<div>
 							<label
 								className='mb-2 block font-medium text-gray-900 text-sm dark:text-white'
-								htmlFor='token'
+								htmlFor={tokenId}
 							>
 								Token *
 							</label>
 							<input
 								className='w-full rounded border border-gray-300 px-3 py-2 font-mono text-gray-900 text-sm focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-								id='token'
+								id={tokenId}
 								onChange={e => setToken(e.target.value)}
 								placeholder='your-api-token'
 								required={true}
@@ -127,13 +133,13 @@ export function KnockerPage() {
 						<div>
 							<label
 								className='mb-2 block font-medium text-gray-900 text-sm dark:text-white'
-								htmlFor='ttl'
+								htmlFor={ttlId}
 							>
 								TTL (seconds)
 							</label>
 							<input
 								className='w-full rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-								id='ttl'
+								id={ttlId}
 								min='1'
 								onChange={e => setTtl(e.target.value)}
 								placeholder='3600'
@@ -145,13 +151,13 @@ export function KnockerPage() {
 						<div>
 							<label
 								className='mb-2 block font-medium text-gray-900 text-sm dark:text-white'
-								htmlFor='ip'
+								htmlFor={ipId}
 							>
 								IP/CIDR to whitelist (optional)
 							</label>
 							<input
 								className='w-full rounded border border-gray-300 px-3 py-2 font-mono text-gray-900 text-sm focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-								id='ip'
+								id={ipId}
 								onChange={e => setIp(e.target.value)}
 								placeholder='192.168.1.0/24'
 								type='text'
