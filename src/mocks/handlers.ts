@@ -50,11 +50,15 @@ export const handlers = [
 			)
 		}
 
-		// Calculate TTL (cap at max)
-		const requestedTTL = body.ttl || MAX_TTL
-		const actualTTL = Math.min(requestedTTL, MAX_TTL)
-		const now = Math.floor(Date.now() / 1000)
-
+    // Calculate TTL (cap at max)
+    const parsedTTL =
+      typeof body.ttl === 'number' && Number.isFinite(body.ttl)
+        ? Math.floor(body.ttl)
+        : undefined
+    const requestedTTL = parsedTTL ?? MAX_TTL
+    const safeTTL = Math.max(1, requestedTTL)
+    const actualTTL = Math.min(safeTTL, MAX_TTL)
+    const now = Math.floor(Date.now() / 1000)
 		return HttpResponse.json({
 			// biome-ignore lint/style/useNamingConvention: API uses snake_case
 			whitelisted_entry: body.ip_address || '192.168.1.100',
