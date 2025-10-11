@@ -46,23 +46,26 @@ export function KnockerPage() {
 	})
 
 	// Load session data on mount
-	useEffect(() => {
-		const session = loadSession()
-		if (session) {
-			setEndpoint(session.endpoint)
-			setToken(session.token)
-			setTtl(session.ttl ? String(session.ttl) : '')
-			setIp(session.ip || '')
+    // Derive autoKnock from the URL so it can be a proper dependency
+    const autoKnock = searchParams.get('autoKnock') === 'true'
 
-			// Auto-knock if query param is present
-			if (searchParams.get('autoKnock') === 'true') {
-				// Use setTimeout to ensure form is fully hydrated
-				setTimeout(() => {
-					knockMutation.mutate()
-				}, 0)
-			}
-		}
-	}, [knockMutation.mutate, searchParams.get]) // Only run on mount
+    useEffect(() => {
+        const session = loadSession()
+        if (session) {
+            setEndpoint(session.endpoint)
+            setToken(session.token)
+            setTtl(session.ttl ? String(session.ttl) : '')
+            setIp(session.ip || '')
+
+            // Auto-knock if query param is present
+            if (autoKnock) {
+                // Use setTimeout to ensure form is fully hydrated
+                setTimeout(() => {
+                    knockMutation.mutate()
+                }, 0)
+            }
+        }
+    }, [autoKnock, knockMutation.mutate])
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault()
