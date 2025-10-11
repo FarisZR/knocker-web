@@ -84,14 +84,27 @@ export function KnockerPage() {
 	return (
 		<>
 			<Head title='Knocker Web' />
-			<div className='flex min-h-screen items-center justify-center bg-white p-4 dark:bg-gray-900'>
+			<div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 dark:from-gray-900 dark:to-gray-950'>
 				<div className='w-full max-w-md'>
-					<h1 className='mb-8 text-center font-bold text-4xl text-gray-900 dark:text-white'>
-						Knocker Web
-					</h1>
+					<div className='mb-8 flex justify-center'>
+						<img
+							alt='Knocker Web'
+							className='h-10 dark:hidden'
+							height='40'
+							src='/knocker-logo-dark.svg'
+							width='200'
+						/>
+						<img
+							alt='Knocker Web'
+							className='hidden h-10 dark:block'
+							height='40'
+							src='/knocker-logo-light.svg'
+							width='200'
+						/>
+					</div>
 
 					<form
-						className='space-y-4 rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800'
+						className='space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-xl transition-shadow hover:shadow-2xl dark:border-gray-700 dark:bg-gray-800'
 						onSubmit={handleSubmit}
 					>
 						<div>
@@ -102,7 +115,7 @@ export function KnockerPage() {
 								Knocker Endpoint URL *
 							</label>
 							<input
-								className='w-full rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+								className='w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-gray-900 shadow-sm transition-all focus:border-[#fde562] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#fde562]/50 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:bg-gray-700'
 								id={endpointId}
 								onChange={e => setEndpoint(e.target.value)}
 								placeholder='https://knocker.example.com'
@@ -120,7 +133,7 @@ export function KnockerPage() {
 								Token *
 							</label>
 							<input
-								className='w-full rounded border border-gray-300 px-3 py-2 font-mono text-gray-900 text-sm focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+								className='w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 font-mono text-gray-900 text-sm shadow-sm transition-all focus:border-[#fde562] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#fde562]/50 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:bg-gray-700'
 								id={tokenId}
 								onChange={e => setToken(e.target.value)}
 								placeholder='your-api-token'
@@ -138,7 +151,7 @@ export function KnockerPage() {
 								TTL (seconds)
 							</label>
 							<input
-								className='w-full rounded border border-gray-300 px-3 py-2 text-gray-900 focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+								className='w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-gray-900 shadow-sm transition-all focus:border-[#fde562] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#fde562]/50 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:bg-gray-700'
 								id={ttlId}
 								min='1'
 								onChange={e => setTtl(e.target.value)}
@@ -156,7 +169,7 @@ export function KnockerPage() {
 								IP/CIDR to whitelist (optional)
 							</label>
 							<input
-								className='w-full rounded border border-gray-300 px-3 py-2 font-mono text-gray-900 text-sm focus:border-[#fde562] focus:outline-none focus:ring-2 focus:ring-[#fde562] dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+								className='w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 font-mono text-gray-900 text-sm shadow-sm transition-all focus:border-[#fde562] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#fde562]/50 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:focus:bg-gray-700'
 								id={ipId}
 								onChange={e => setIp(e.target.value)}
 								placeholder='192.168.1.0/24'
@@ -169,7 +182,7 @@ export function KnockerPage() {
 						</div>
 
 						<button
-							className='w-full rounded bg-[#fde562] px-4 py-2 font-semibold text-gray-900 transition-colors hover:bg-[#fcd645] focus:outline-none focus:ring-2 focus:ring-[#fde562] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:focus:ring-offset-gray-800'
+							className='w-full rounded-lg bg-gradient-to-r from-[#fde562] to-[#fcd645] px-4 py-3 font-semibold text-gray-900 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#fde562] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 dark:focus:ring-offset-gray-800'
 							disabled={knockMutation.isPending}
 							type='submit'
 						>
@@ -179,39 +192,41 @@ export function KnockerPage() {
 
 					{/* Success message */}
 					{knockMutation.isSuccess && result && (
-						<div className='mt-6 rounded-lg border-2 border-green-500 bg-green-50 p-4 dark:bg-green-900/20'>
+						<div className='fade-in slide-in-from-bottom-4 mt-6 animate-in rounded-xl border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 p-5 shadow-lg dark:from-green-900/20 dark:to-emerald-900/20'>
 							<div className='flex items-center'>
-								<svg
-									aria-label='Success checkmark'
-									className='mr-2 h-6 w-6 text-green-500'
-									fill='none'
-									role='img'
-									stroke='currentColor'
-									viewBox='0 0 24 24'
-								>
-									<path
-										d='M5 13l4 4L19 7'
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										strokeWidth={2}
-									/>
-								</svg>
-								<h3 className='font-semibold text-green-800 dark:text-green-200'>
+								<div className='mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-500 shadow-md'>
+									<svg
+										aria-label='Success checkmark'
+										className='h-5 w-5 text-white'
+										fill='none'
+										role='img'
+										stroke='currentColor'
+										strokeWidth={3}
+										viewBox='0 0 24 24'
+									>
+										<path
+											d='M5 13l4 4L19 7'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+										/>
+									</svg>
+								</div>
+								<h3 className='font-bold text-green-900 text-lg dark:text-green-100'>
 									Success!
 								</h3>
 							</div>
-							<div className='mt-2 text-green-700 text-sm dark:text-green-300'>
+							<div className='mt-3 text-green-800 text-sm dark:text-green-200'>
 								<p>
 									<strong>Whitelisted:</strong>{' '}
-									<code className='rounded bg-green-100 px-1 py-0.5 dark:bg-green-800'>
+									<code className='rounded-md bg-green-100 px-2 py-1 font-mono text-xs shadow-sm dark:bg-green-800'>
 										{result.whitelisted_entry}
 									</code>
 								</p>
-								<p className='mt-1'>
+								<p className='mt-2'>
 									<strong>Expires in:</strong> {result.expires_in_seconds}{' '}
 									seconds
 								</p>
-								<p className='mt-1 text-xs'>
+								<p className='mt-1 text-xs opacity-75'>
 									<strong>Expires at:</strong>{' '}
 									{new Date(result.expires_at * 1000).toLocaleString()}
 								</p>
@@ -219,7 +234,7 @@ export function KnockerPage() {
 
 							{/* TTL warning */}
 							{showTtlWarning && (
-								<div className='mt-3 rounded border border-yellow-400 bg-yellow-50 p-2 dark:bg-yellow-900/20'>
+								<div className='mt-4 rounded-lg border border-yellow-400 bg-yellow-50 p-3 shadow-sm dark:bg-yellow-900/20'>
 									<p className='text-xs text-yellow-800 dark:text-yellow-200'>
 										⚠️ TTL was capped by the server. Requested: {requestedTtl}s,
 										Applied: {result.expires_in_seconds}s
@@ -231,28 +246,30 @@ export function KnockerPage() {
 
 					{/* Error message */}
 					{knockMutation.isError && (
-						<div className='mt-6 rounded-lg border-2 border-red-500 bg-red-50 p-4 dark:bg-red-900/20'>
+						<div className='fade-in slide-in-from-bottom-4 mt-6 animate-in rounded-xl border-2 border-red-500 bg-gradient-to-br from-red-50 to-rose-50 p-5 shadow-lg dark:from-red-900/20 dark:to-rose-900/20'>
 							<div className='flex items-center'>
-								<svg
-									aria-label='Error X mark'
-									className='mr-2 h-6 w-6 text-red-500'
-									fill='none'
-									role='img'
-									stroke='currentColor'
-									viewBox='0 0 24 24'
-								>
-									<path
-										d='M6 18L18 6M6 6l12 12'
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										strokeWidth={2}
-									/>
-								</svg>
-								<h3 className='font-semibold text-red-800 dark:text-red-200'>
+								<div className='mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 shadow-md'>
+									<svg
+										aria-label='Error X mark'
+										className='h-5 w-5 text-white'
+										fill='none'
+										role='img'
+										stroke='currentColor'
+										strokeWidth={3}
+										viewBox='0 0 24 24'
+									>
+										<path
+											d='M6 18L18 6M6 6l12 12'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+										/>
+									</svg>
+								</div>
+								<h3 className='font-bold text-lg text-red-900 dark:text-red-100'>
 									Error
 								</h3>
 							</div>
-							<p className='mt-2 text-red-700 text-sm dark:text-red-300'>
+							<p className='mt-3 text-red-800 text-sm dark:text-red-200'>
 								{knockMutation.error?.message || 'Failed to knock'}
 							</p>
 						</div>

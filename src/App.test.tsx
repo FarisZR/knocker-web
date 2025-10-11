@@ -14,7 +14,8 @@ it.each(widths)('renders knocker form with %o viewport', async width => {
 	window.happyDOM?.setViewport({width, height: 720})
 	render(<App />, {route: '/'})
 
-	expect(screen.getByText('Knocker Web')).toBeInTheDocument()
+	// Check for logos (we have two - one for light and one for dark mode)
+	expect(screen.getAllByAltText('Knocker Web')).toHaveLength(2)
 	expect(screen.getByLabelText(/endpoint url/i)).toBeInTheDocument()
 	expect(screen.getByLabelText(/token/i)).toBeInTheDocument()
 	expect(screen.getByRole('button', {name: /knock/i})).toBeInTheDocument()
@@ -54,6 +55,6 @@ it('handles knock error', async () => {
 it('shows loading state in suspense', () => {
 	render(<App />)
 
-	// The app should render immediately
-	expect(screen.getByText('Knocker Web')).toBeInTheDocument()
+	// The app should render immediately with the logo (2 versions for light/dark)
+	expect(screen.getAllByAltText('Knocker Web')).toHaveLength(2)
 })
