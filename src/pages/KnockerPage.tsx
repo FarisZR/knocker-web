@@ -192,19 +192,19 @@ export function KnockerPage() {
 							{/* Auto-knock toggle */}
 							<div className='mt-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-100/50 p-3 dark:border-green-700 dark:bg-green-900/10'>
 								<label
-									id={autoKnockToggleId}
 									className='font-medium text-green-900 text-sm dark:text-green-100'
+									htmlFor={autoKnockToggleId}
 								>
 									Auto-knock on page load
 								</label>
 								<button
 									aria-checked={enableAutoKnock}
-									aria-labelledby={autoKnockToggleId}
 									className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
 										enableAutoKnock
 											? 'bg-green-500'
 											: 'bg-gray-300 dark:bg-gray-600'
 									}`}
+									id={autoKnockToggleId}
 									onClick={handleAutoKnockToggle}
 									role='switch'
 									type='button'
