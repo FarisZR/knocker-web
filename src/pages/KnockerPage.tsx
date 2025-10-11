@@ -6,19 +6,21 @@ import {Head} from '@/components/Head'
 import {loadSession, saveSession} from '@/utils/sessionStorage'
 
 export function KnockerPage() {
-	const [searchParams] = useSearchParams()
+	const [searchParams, setSearchParams] = useSearchParams()
 	const [endpoint, setEndpoint] = useState('')
 	const [token, setToken] = useState('')
 	const [ttl, setTtl] = useState('')
 	const [ip, setIp] = useState('')
 	const [result, setResult] = useState<KnockResponse | null>(null)
 	const [requestedTtl, setRequestedTtl] = useState<number | null>(null)
+	const [enableAutoKnock, setEnableAutoKnock] = useState(false)
 
 	// Generate unique IDs for form inputs
 	const endpointId = useId()
 	const tokenId = useId()
 	const ttlId = useId()
 	const ipId = useId()
+	const autoKnockToggleId = useId()
 
 	const knockMutation = useMutation({
 		mutationFn: async () => {
@@ -27,21 +29,31 @@ export function KnockerPage() {
 
 			setRequestedTtl(ttlValue)
 
-			const response = await knock(endpoint, token, {
-				ttl: ttlValue || undefined,
-				// biome-ignore lint/style/useNamingConvention: API uses snake_case
-				ip_address: ipValue || undefined
-			})
+			try {
+				const response = await knock(endpoint, token, {
+					ttl: ttlValue || undefined,
+					// biome-ignore lint/style/useNamingConvention: API uses snake_case
+					ip_address: ipValue || undefined
+				})
 
-			// Save to session storage on success
-			saveSession({
-				endpoint,
-				token,
-				ttl: ttlValue,
-				ip: ipValue
-			})
+				// Save to session storage on success
+				saveSession({
+					endpoint,
+					token,
+					ttl: ttlValue,
+					ip: ipValue
+				})
 
-			return response
+				return response
+			} catch (error) {
+				// Improve error message for network failures
+				if (error instanceof TypeError && error.message === 'Failed to fetch') {
+					throw new Error(
+						'Failed to reach Knocker. Are you sure Knocker is running?'
+					)
+				}
+				throw error
+			}
 		},
 		onSuccess: data => {
 			setResult(data)
@@ -52,9 +64,6 @@ export function KnockerPage() {
 	})
 
 	// Load session data on mount
-	// Derive autoKnock from the URL so it can be a proper dependency
-	const autoKnock = searchParams.get('autoKnock') === 'true'
-
 	useEffect(() => {
 		const session = loadSession()
 		if (session) {
@@ -62,16 +71,29 @@ export function KnockerPage() {
 			setToken(session.token)
 			setTtl(session.ttl ? String(session.ttl) : '')
 			setIp(session.ip || '')
-
-			// Auto-knock if query param is present
-			if (autoKnock) {
-				// Use setTimeout to ensure form is fully hydrated
-				setTimeout(() => {
-					knockMutation.mutate()
-				}, 0)
-			}
+			setEnableAutoKnock(session.endpoint !== '' && session.token !== '')
 		}
-	}, [autoKnock, knockMutation.mutate])
+	}, [])
+
+	// Auto-knock when enabled and data is loaded
+	useEffect(() => {
+		const shouldAutoKnock = searchParams.get('autoKnock') === 'true'
+		if (
+			shouldAutoKnock &&
+			enableAutoKnock &&
+			endpoint &&
+			token &&
+			!knockMutation.isPending &&
+			!result
+		) {
+			// Small delay to ensure form is fully hydrated
+			const timer = setTimeout(() => {
+				knockMutation.mutate()
+			}, 100)
+			return () => clearTimeout(timer)
+		}
+		return
+	}, [enableAutoKnock, endpoint, token, searchParams, knockMutation, result])
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault()
@@ -81,12 +103,24 @@ export function KnockerPage() {
 	const showTtlWarning =
 		result && requestedTtl && result.expires_in_seconds < requestedTtl
 
+	const handleAutoKnockToggle = () => {
+		const newValue = !enableAutoKnock
+		setEnableAutoKnock(newValue)
+
+		// Update URL params
+		if (newValue) {
+			setSearchParams({autoKnock: 'true'})
+		} else {
+			setSearchParams({})
+		}
+	}
+
 	return (
 		<>
 			<Head title='Knocker Web' />
 			<div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 dark:from-gray-900 dark:to-gray-950'>
 				<div className='w-full max-w-md'>
-					<div className='mb-8 flex justify-center'>
+					<div className='mb-6 flex justify-center'>
 						<img
 							alt='Knocker Web'
 							className='h-10 dark:hidden'
@@ -102,6 +136,119 @@ export function KnockerPage() {
 							width='200'
 						/>
 					</div>
+
+					{/* Success message - moved to top */}
+					{knockMutation.isSuccess && result && (
+						<div className='fade-in slide-in-from-top-4 mb-6 animate-in rounded-xl border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 p-5 shadow-lg dark:from-green-900/20 dark:to-emerald-900/20'>
+							<div className='flex items-center'>
+								<div className='mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-500 shadow-md'>
+									<svg
+										aria-label='Success checkmark'
+										className='h-5 w-5 text-white'
+										fill='none'
+										role='img'
+										stroke='currentColor'
+										strokeWidth={3}
+										viewBox='0 0 24 24'
+									>
+										<path
+											d='M5 13l4 4L19 7'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+										/>
+									</svg>
+								</div>
+								<h3 className='font-bold text-green-900 text-lg dark:text-green-100'>
+									Success!
+								</h3>
+							</div>
+							<div className='mt-3 text-green-800 text-sm dark:text-green-200'>
+								<p>
+									<strong>Whitelisted:</strong>{' '}
+									<code className='rounded-md bg-green-100 px-2 py-1 font-mono text-xs shadow-sm dark:bg-green-800'>
+										{result.whitelisted_entry}
+									</code>
+								</p>
+								<p className='mt-2'>
+									<strong>Expires in:</strong> {result.expires_in_seconds}{' '}
+									seconds
+								</p>
+								<p className='mt-1 text-xs opacity-75'>
+									<strong>Expires at:</strong>{' '}
+									{new Date(result.expires_at * 1000).toLocaleString()}
+								</p>
+							</div>
+
+							{/* TTL warning */}
+							{showTtlWarning && (
+								<div className='mt-4 rounded-lg border border-yellow-400 bg-yellow-50 p-3 shadow-sm dark:bg-yellow-900/20'>
+									<p className='text-xs text-yellow-800 dark:text-yellow-200'>
+										⚠️ TTL was capped by the server. Requested: {requestedTtl}s,
+										Applied: {result.expires_in_seconds}s
+									</p>
+								</div>
+							)}
+
+							{/* Auto-knock toggle */}
+							<div className='mt-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-100/50 p-3 dark:border-green-700 dark:bg-green-900/10'>
+								<label
+									className='font-medium text-green-900 text-sm dark:text-green-100'
+									htmlFor={autoKnockToggleId}
+								>
+									Auto-knock on page load
+								</label>
+								<button
+									aria-checked={enableAutoKnock}
+									className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
+										enableAutoKnock
+											? 'bg-green-500'
+											: 'bg-gray-300 dark:bg-gray-600'
+									}`}
+									id={autoKnockToggleId}
+									onClick={handleAutoKnockToggle}
+									role='switch'
+									type='button'
+								>
+									<span
+										className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+											enableAutoKnock ? 'translate-x-6' : 'translate-x-1'
+										}`}
+									/>
+								</button>
+							</div>
+						</div>
+					)}
+
+					{/* Error message - moved to top */}
+					{knockMutation.isError && (
+						<div className='fade-in slide-in-from-top-4 mb-6 animate-in rounded-xl border-2 border-red-500 bg-gradient-to-br from-red-50 to-rose-50 p-5 shadow-lg dark:from-red-900/20 dark:to-rose-900/20'>
+							<div className='flex items-center'>
+								<div className='mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 shadow-md'>
+									<svg
+										aria-label='Error X mark'
+										className='h-5 w-5 text-white'
+										fill='none'
+										role='img'
+										stroke='currentColor'
+										strokeWidth={3}
+										viewBox='0 0 24 24'
+									>
+										<path
+											d='M6 18L18 6M6 6l12 12'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+										/>
+									</svg>
+								</div>
+								<h3 className='font-bold text-lg text-red-900 dark:text-red-100'>
+									Error
+								</h3>
+							</div>
+							<p className='mt-3 text-red-800 text-sm dark:text-red-200'>
+								{knockMutation.error?.message || 'Failed to knock'}
+							</p>
+						</div>
+					)}
 
 					<form
 						className='space-y-4 rounded-xl border border-gray-200 bg-white p-6 shadow-xl transition-shadow hover:shadow-2xl dark:border-gray-700 dark:bg-gray-800'
@@ -189,91 +336,6 @@ export function KnockerPage() {
 							{knockMutation.isPending ? 'Knocking...' : 'Knock'}
 						</button>
 					</form>
-
-					{/* Success message */}
-					{knockMutation.isSuccess && result && (
-						<div className='fade-in slide-in-from-bottom-4 mt-6 animate-in rounded-xl border-2 border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 p-5 shadow-lg dark:from-green-900/20 dark:to-emerald-900/20'>
-							<div className='flex items-center'>
-								<div className='mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-500 shadow-md'>
-									<svg
-										aria-label='Success checkmark'
-										className='h-5 w-5 text-white'
-										fill='none'
-										role='img'
-										stroke='currentColor'
-										strokeWidth={3}
-										viewBox='0 0 24 24'
-									>
-										<path
-											d='M5 13l4 4L19 7'
-											strokeLinecap='round'
-											strokeLinejoin='round'
-										/>
-									</svg>
-								</div>
-								<h3 className='font-bold text-green-900 text-lg dark:text-green-100'>
-									Success!
-								</h3>
-							</div>
-							<div className='mt-3 text-green-800 text-sm dark:text-green-200'>
-								<p>
-									<strong>Whitelisted:</strong>{' '}
-									<code className='rounded-md bg-green-100 px-2 py-1 font-mono text-xs shadow-sm dark:bg-green-800'>
-										{result.whitelisted_entry}
-									</code>
-								</p>
-								<p className='mt-2'>
-									<strong>Expires in:</strong> {result.expires_in_seconds}{' '}
-									seconds
-								</p>
-								<p className='mt-1 text-xs opacity-75'>
-									<strong>Expires at:</strong>{' '}
-									{new Date(result.expires_at * 1000).toLocaleString()}
-								</p>
-							</div>
-
-							{/* TTL warning */}
-							{showTtlWarning && (
-								<div className='mt-4 rounded-lg border border-yellow-400 bg-yellow-50 p-3 shadow-sm dark:bg-yellow-900/20'>
-									<p className='text-xs text-yellow-800 dark:text-yellow-200'>
-										⚠️ TTL was capped by the server. Requested: {requestedTtl}s,
-										Applied: {result.expires_in_seconds}s
-									</p>
-								</div>
-							)}
-						</div>
-					)}
-
-					{/* Error message */}
-					{knockMutation.isError && (
-						<div className='fade-in slide-in-from-bottom-4 mt-6 animate-in rounded-xl border-2 border-red-500 bg-gradient-to-br from-red-50 to-rose-50 p-5 shadow-lg dark:from-red-900/20 dark:to-rose-900/20'>
-							<div className='flex items-center'>
-								<div className='mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 shadow-md'>
-									<svg
-										aria-label='Error X mark'
-										className='h-5 w-5 text-white'
-										fill='none'
-										role='img'
-										stroke='currentColor'
-										strokeWidth={3}
-										viewBox='0 0 24 24'
-									>
-										<path
-											d='M6 18L18 6M6 6l12 12'
-											strokeLinecap='round'
-											strokeLinejoin='round'
-										/>
-									</svg>
-								</div>
-								<h3 className='font-bold text-lg text-red-900 dark:text-red-100'>
-									Error
-								</h3>
-							</div>
-							<p className='mt-3 text-red-800 text-sm dark:text-red-200'>
-								{knockMutation.error?.message || 'Failed to knock'}
-							</p>
-						</div>
-					)}
 				</div>
 			</div>
 		</>

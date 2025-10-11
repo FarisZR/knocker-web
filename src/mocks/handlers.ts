@@ -24,6 +24,7 @@ export const handlers = [
 		} else if (typeof window !== 'undefined') {
 			// Browser environment - allow any non-empty token
 			// (but still treat the admin token specially)
+			// biome-ignore lint/style/useCollapsedIf: Nested check is clearer for browser-specific validation
 			if (apiKey === '') {
 				return HttpResponse.json({error: 'Invalid API key'}, {status: 401})
 			}
