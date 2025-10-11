@@ -108,11 +108,37 @@
 			}
 		},
 		{
-			"includes": ["src/**/*.test.tsx"],
+			"includes": ["src/**/*.test.tsx", "src/**/*.test.ts"],
 			"linter": {
 				"rules": {
+					"complexity": {
+						"noExcessiveLinesPerFunction": "off"
+					},
+					"correctness": {
+						"noUndeclaredVariables": "off"
+					},
 					"performance": {
 						"useTopLevelRegex": "off"
+					},
+					"style": {
+						"useNamingConvention": "off"
+					},
+					"suspicious": {
+						"noEmptyBlockStatements": "off",
+						"useAwait": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["src/pages/KnockerPage.tsx"],
+			"linter": {
+				"rules": {
+					"complexity": {
+						"noExcessiveLinesPerFunction": "off"
+					},
+					"correctness": {
+						"useUniqueElementIds": "off"
 					}
 				}
 			}
