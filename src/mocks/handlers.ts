@@ -13,8 +13,20 @@ export const handlers = [
 			return HttpResponse.json({error: 'Missing API key'}, {status: 401})
 		}
 
-		if (apiKey !== VALID_TOKEN && apiKey !== ADMIN_TOKEN) {
-			return HttpResponse.json({error: 'Invalid API key'}, {status: 401})
+		// In the browser (dev) MSW worker, accept any non-empty token so
+		// developers can use real tokens during local development. In node
+		// (tests) keep the strict token validation.
+		if (typeof window === 'undefined') {
+			// Node environment - used by tests
+			if (apiKey !== VALID_TOKEN && apiKey !== ADMIN_TOKEN) {
+				return HttpResponse.json({error: 'Invalid API key'}, {status: 401})
+			}
+		} else if (typeof window !== 'undefined') {
+			// Browser environment - allow any non-empty token
+			// (but still treat the admin token specially)
+			if (apiKey === '') {
+				return HttpResponse.json({error: 'Invalid API key'}, {status: 401})
+			}
 		}
 
 		// Parse request body

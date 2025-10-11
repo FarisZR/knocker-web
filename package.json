@@ -16,11 +16,12 @@
 		"format": "biome format --write",
 		"validate": "pnpm lint && pnpm test:ci && pnpm test:e2e:ci",
 		"build": "vite build",
-		"preview": "vite preview"
+		"preview": "vite preview --host"
 	},
 	"dependencies": {
 		"@tanstack/react-query": "5.85.6",
 		"@tanstack/react-query-devtools": "5.85.6",
+		"pnpm": "^10.18.2",
 		"react": "19.1.1",
 		"react-dom": "19.1.1",
 		"react-error-boundary": "6.0.0",

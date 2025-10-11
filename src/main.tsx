@@ -9,10 +9,11 @@ import {App} from './App'
 const queryClient = new QueryClient()
 
 async function enableMocking() {
-	// TODO: uncomment this line
-	// if (process.env.NODE_ENV !== 'development') {
-	//   return
-	// }
+	// Only enable mocking during local development. This prevents the
+	// service worker from running in preview/production builds.
+	if (!import.meta.env.DEV) {
+		return
+	}
 	const {worker} = await import('./mocks/browser')
 	return worker.start()
 }
