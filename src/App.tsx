@@ -14,6 +14,7 @@ export function App() {
 			<Suspense fallback={<LoadingOrError />}>
 				<Routes>
 					<Route element={<KnockerPage />} index={true} />
+					<Route element={<KnockerPage />} path='*' />
 				</Routes>
 			</Suspense>
 		</ErrorBoundary>

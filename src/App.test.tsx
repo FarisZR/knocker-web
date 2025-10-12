@@ -58,3 +58,10 @@ it('shows loading state in suspense', () => {
 	// The app should render immediately with the logo (2 versions for light/dark)
 	expect(screen.getAllByAltText('Knocker Web')).toHaveLength(2)
 })
+
+it('renders on nested paths when hosted in a subdirectory', () => {
+	render(<App />, {route: '/knocker-web/pr-preview/pr-1/'})
+
+	expect(screen.getAllByAltText('Knocker Web')).toHaveLength(2)
+	expect(screen.getByLabelText(/endpoint url/i)).toBeInTheDocument()
+})
