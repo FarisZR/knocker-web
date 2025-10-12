@@ -6,4 +6,8 @@ declare global {
 	interface Window {
 		happyDOM?: DetachedWindowApi
 	}
+
+	interface ImportMetaEnv {
+		readonly VITE_MSW_STRICT?: string
+	}
 }

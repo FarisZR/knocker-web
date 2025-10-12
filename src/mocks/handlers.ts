@@ -5,6 +5,8 @@ const ADMIN_TOKEN = 'admin-token-456'
 const MAX_TTL = 3600 // 1 hour
 
 const isRunningTests = import.meta.env.MODE === 'test'
+const isStrictMockMode =
+	import.meta.env.VITE_MSW_STRICT === 'true' || isRunningTests
 
 // Helper to validate API key
 function validateApiKey(apiKey: string | null) {
@@ -15,7 +17,7 @@ function validateApiKey(apiKey: string | null) {
 	// In the browser (dev) MSW worker, accept any non-empty token so
 	// developers can use real tokens during local development. In node
 	// (tests) keep the strict token validation.
-	if (typeof window === 'undefined' || isRunningTests) {
+	if (typeof window === 'undefined' || isStrictMockMode) {
 		// Node environment - used by tests
 		if (apiKey !== VALID_TOKEN && apiKey !== ADMIN_TOKEN) {
 			return HttpResponse.json({error: 'Invalid API key'}, {status: 401})

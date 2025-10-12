@@ -120,6 +120,7 @@ export function KnockerPage() {
 			<Head title='Knocker Web' />
 			<div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 dark:from-gray-900 dark:to-gray-950'>
 				<div className='w-full max-w-md'>
+					<h1 className='sr-only'>Knocker Web</h1>
 					<div className='mb-6 flex justify-center'>
 						<img
 							alt='Knocker Web'
