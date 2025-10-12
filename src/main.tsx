@@ -27,7 +27,7 @@ enableMocking()
 				<StrictMode>
 					<QueryClientProvider client={queryClient}>
 						<ReactQueryDevtools initialIsOpen={false} />
-						<BrowserRouter>
+						<BrowserRouter basename={import.meta.env.BASE_URL}>
 							<App />
 						</BrowserRouter>
 					</QueryClientProvider>

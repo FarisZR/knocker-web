@@ -1,4 +1,5 @@
 import {HttpResponse, http} from 'msw'
+import {vi} from 'vitest'
 import {server} from '../mocks/server'
 import {queryClient, render, screen, waitFor} from '../test-utils'
 import {KnockerPage} from './KnockerPage'
@@ -154,6 +155,55 @@ describe('KnockerPage', () => {
 		await waitFor(() => {
 			expect(screen.getByText(/ttl.*capped/i)).toBeInTheDocument()
 		})
+	})
+
+	it('toggles auto-knock query parameter when switch is clicked', async () => {
+		sessionStorage.setItem(
+			'knocker_session',
+			JSON.stringify({
+				endpoint: 'https://example.com',
+				token: 'test-token-123',
+				ttl: null,
+				ip: null
+			})
+		)
+
+		const {user} = render(<KnockerPage />, {route: '/?autoKnock=true'})
+
+		const toggle = await screen.findByRole('switch', {
+			name: /auto-knock on page load/i
+		})
+
+		expect(window.location.search).toBe('?autoKnock=true')
+		await user.click(toggle)
+		expect(window.location.search).toBe('')
+
+		await user.click(toggle)
+		expect(window.location.search).toBe('?autoKnock=true')
+	})
+
+	it('shows friendly network error message when fetch fails', async () => {
+		const originalFetch = globalThis.fetch
+		globalThis.fetch = vi.fn(() =>
+			Promise.reject(new TypeError('Failed to fetch'))
+		) as unknown as typeof fetch
+
+		try {
+			const {user} = render(<KnockerPage />)
+
+			await user.type(
+				screen.getByLabelText(/endpoint url/i),
+				'https://example.com'
+			)
+			await user.type(screen.getByLabelText(/token/i), 'test-token-123')
+			await user.click(screen.getByRole('button', {name: /knock/i}))
+
+			await waitFor(() => {
+				expect(screen.getByText(/failed to reach knocker/i)).toBeInTheDocument()
+			})
+		} finally {
+			globalThis.fetch = originalFetch
+		}
 	})
 
 	it('validates required fields', async () => {
