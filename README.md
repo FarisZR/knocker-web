@@ -2,7 +2,7 @@
 
 ![Test workflow](https://github.com/FarisZR/knocker-web/actions/workflows/test.yml/badge.svg) [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/FarisZR/knocker-web/blob/main/LICENSE)
 
-![Knocker Web](image.png)
+![Knocker Web](public/screenshot.png)
 
 
 A client-side web application for interacting with [Knocker](https://github.com/FarisZR/knocker), a token-based IP whitelisting solution.
