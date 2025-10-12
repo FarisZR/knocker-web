@@ -125,14 +125,14 @@ export function KnockerPage() {
 							alt='Knocker Web'
 							className='h-10 dark:hidden'
 							height='40'
-							src='/knocker-logo-dark.svg'
+							src='./knocker-logo-dark.svg'
 							width='200'
 						/>
 						<img
 							alt='Knocker Web'
 							className='hidden h-10 dark:block'
 							height='40'
-							src='/knocker-logo-light.svg'
+							src='./knocker-logo-light.svg'
 							width='200'
 						/>
 					</div>
