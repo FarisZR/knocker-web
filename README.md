@@ -37,9 +37,9 @@ pnpm install
 
 ## Usage
 
-1. **Start the development server**:
+1. **Start the preview server**:
    ```bash
-   pnpm dev
+   pnpm preview
    ```
 
 2. **Enter your Knocker details**:
