@@ -121,19 +121,26 @@ export function KnockerPage() {
 			<div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4 dark:from-gray-900 dark:to-gray-950'>
 				<div className='w-full max-w-md'>
 					<h1 className='sr-only'>Knocker Web</h1>
-					<div className='mb-6 flex justify-center'>
+					<div className='flex items-center justify-center space-x-3 mb-6'>
+						<img
+							alt='Knocker icon'
+							className='h-8'
+							height='32'
+							src='/logos/knocker-icon.svg'
+							width='32'
+						/>
 						<img
 							alt='Knocker Web'
 							className='h-10 dark:hidden'
 							height='40'
-							src='./knocker-logo-dark.svg'
+							src='/logos/knocker-black.svg'
 							width='200'
 						/>
 						<img
 							alt='Knocker Web'
 							className='hidden h-10 dark:block'
 							height='40'
-							src='./knocker-logo-light.svg'
+							src='/logos/knocker.svg'
 							width='200'
 						/>
 					</div>
