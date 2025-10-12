@@ -126,21 +126,21 @@ export function KnockerPage() {
 							alt='Knocker icon'
 							className='h-8'
 							height='32'
-							src='/logos/knocker-icon.svg'
+							src='./logos/knocker-icon.svg'
 							width='32'
 						/>
 						<img
 							alt='Knocker Web'
 							className='h-10 dark:hidden'
 							height='40'
-							src='/logos/knocker-black.svg'
+							src='./logos/knocker-black.svg'
 							width='200'
 						/>
 						<img
 							alt='Knocker Web'
 							className='hidden h-10 dark:block'
 							height='40'
-							src='/logos/knocker.svg'
+							src='./logos/knocker.svg'
 							width='200'
 						/>
 					</div>
