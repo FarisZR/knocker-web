@@ -1,0 +1,12 @@
+# Project Coding Rules (Non-Obvious Only)
+- Always use [`loadSession()`](src/utils/sessionStorage.ts:1) / [`saveSession()`](src/utils/sessionStorage.ts:10) to persist session; they silently swallow storage errors and use key `knocker_session`.
+- API schemas use snake_case; valibot schemas expect snake_case request/response (see [`src/api/knocker.ts`](src/api/knocker.ts:7)).
+- `knock()` normalizes endpoint (removes trailing slash and appends `/knock`); pass either the full `/knock` URL or the base URL and let the helper normalize it (see [`src/api/knocker.ts`](src/api/knocker.ts:38)).
+- Tests rely on the global MSW server started in [`src/test-setup.ts`](src/test-setup.ts:1); do not start another MSW server in node tests.
+- MSW strict mode (node/tests or VITE_MSW_STRICT='true') accepts only `test-token-123` or `admin-token-456`; browser/dev allows any non-empty token — adjust test tokens accordingly (see [`src/mocks/handlers.ts`](src/mocks/handlers.ts:3)).
+- Use the shared QueryClient from [`src/test-utils.tsx`](src/test-utils.tsx:7) in tests; it disables retries and GC to avoid flakiness.
+- Biome enforces tabs, single quotes (JSX single quotes) and ASCII filename rules; tests disable naming checks but follow ASCII in source (see [`biome.json`](biome.json:14,85)).
+- Vitest uses `happy-dom` and `setupFiles: 'src/test-setup.ts'`; tests must match `src/**/*.test.ts?(x)` (see [`vite.config.ts`](vite.config.ts:16,35)).
+- Coverage thresholds are strict in [`vite.config.ts`](vite.config.ts:19-30); prefer targeted tests rather than lowering thresholds.
+- Handler helpers validate TTL and parse JSON safely (see [`src/mocks/handlers.ts`](src/mocks/handlers.ts:34,52)); mirror that defensive style in code that calls handlers.
+- Prefer using project API helpers (`knock`) instead of reimplementing fetch logic — errors are normalized and improved (see [`src/api/knocker.ts`](src/api/knocker.ts:49-62)).
