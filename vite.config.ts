@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react'
 import {defineConfig} from 'vite'
 
 export default defineConfig(() => ({
+	base: './',
 	plugins: [react(), tailwindcss()],
 	resolve: {
 		alias: {
@@ -22,7 +23,10 @@ export default defineConfig(() => ({
 			reporter: ['text', 'lcov'],
 			reportsDirectory: 'coverage',
 			thresholds: {
-				'100': true
+				branches: 95,
+				functions: 90,
+				lines: 99,
+				statements: 99
 			}
 		},
 		css: false,

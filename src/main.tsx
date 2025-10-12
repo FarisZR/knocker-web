@@ -7,12 +7,41 @@ import {BrowserRouter} from 'react-router'
 import {App} from './App'
 
 const queryClient = new QueryClient()
+const TRAILING_SLASH_REGEX = /\/+$/
+
+function normalizeBasename(rawBase: string | undefined) {
+	if (!rawBase || rawBase === '/' || rawBase === '.' || rawBase === './') {
+		return '/'
+	}
+
+	const trimmed = rawBase.trim()
+	if (trimmed === '') {
+		return '/'
+	}
+
+	try {
+		const baseUrl =
+			typeof window !== 'undefined'
+				? new URL(trimmed, window.location.origin)
+				: new URL(trimmed, 'http://localhost')
+		const normalizedPath = baseUrl.pathname.replace(TRAILING_SLASH_REGEX, '')
+		return normalizedPath === '' ? '/' : normalizedPath
+	} catch {
+		const ensuredLeadingSlash = trimmed.startsWith('/')
+			? trimmed
+			: `/${trimmed}`
+		return ensuredLeadingSlash.replace(TRAILING_SLASH_REGEX, '') || '/'
+	}
+}
+
+const routerBasename = normalizeBasename(import.meta.env.BASE_URL)
 
 async function enableMocking() {
-	// TODO: uncomment this line
-	// if (process.env.NODE_ENV !== 'development') {
-	//   return
-	// }
+	// Only enable mocking during local development. This prevents the
+	// service worker from running in preview/production builds.
+	if (!import.meta.env.DEV) {
+		return
+	}
 	const {worker} = await import('./mocks/browser')
 	return worker.start()
 }
@@ -26,7 +55,7 @@ enableMocking()
 				<StrictMode>
 					<QueryClientProvider client={queryClient}>
 						<ReactQueryDevtools initialIsOpen={false} />
-						<BrowserRouter>
+						<BrowserRouter basename={routerBasename}>
 							<App />
 						</BrowserRouter>
 					</QueryClientProvider>

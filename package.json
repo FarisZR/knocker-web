@@ -16,7 +16,7 @@
 		"format": "biome format --write",
 		"validate": "pnpm lint && pnpm test:ci && pnpm test:e2e:ci",
 		"build": "vite build",
-		"preview": "vite preview"
+		"preview": "vite preview --host"
 	},
 	"dependencies": {
 		"@tanstack/react-query": "5.85.6",

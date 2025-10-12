@@ -1,30 +1,56 @@
-# Vitamin 2.0
+# Knocker Web
 
-![Test workflow](https://github.com/wtchnm/Vitamin/actions/workflows/test.yml/badge.svg) [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/wtchnm/Vitamin/blob/main/LICENSE)
+![Test workflow](https://github.com/FarisZR/knocker-web/actions/workflows/test.yml/badge.svg) [![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/FarisZR/knocker-web/blob/main/LICENSE)
 
-Opinionated Vite starter template. Previous version available on v1 branch.
+A client-side web application for interacting with [Knocker](https://github.com/FarisZR/knocker), a token-based IP whitelisting solution.
 
-## Features
+## About
+
+Knocker Web provides a user-friendly interface for managing IP whitelisting through the Knocker API. It features:
+
+- **Client-side operation**: No backend required, all processing happens in your browser
+- **Session persistence**: Your settings are saved for convenience (in browser session storage)
+- **Auto-knock**: Automatically whitelist your IP on page load
+- **Dark mode support**: Elegant UI with light and dark themes
+- **TTL management**: Configure Time-To-Live for whitelist entries with warnings when capped
+- **Remote whitelisting**: Support for whitelisting specific IP/CIDR ranges (requires admin token)
+
+## Tech Stack
 
 - [Vite 6](https://vitejs.dev) with [React 19](https://reactjs.org), [TypeScript 5](https://www.typescriptlang.org) and [absolute imports](https://github.com/aleclarson/vite-tsconfig-paths).
-- [Tailwind CSS v4](https://tailwindcss.com) for easy stylization.
+- [Tailwind CSS v4](https://tailwindcss.com) for styling with custom accent color (#fde562).
+- [TanStack Query](https://tanstack.com/query) for API state management.
+- [Valibot](https://valibot.dev) for runtime type validation.
 - [Biome V2](https://next.biomejs.dev) for linting, formatting and automatic import sorting.
-- Write unit and integration tests with [Vitest 3](https://vitest.dev/) and [Testing Library 16](https://testing-library.com/).
-- Write e2e tests with [Playwright 1.52](https://www.cypress.io).
+- Comprehensive testing with [Vitest 3](https://vitest.dev/), [Testing Library 16](https://testing-library.com/), and [MSW](https://mswjs.io).
+- E2E tests with [Playwright 1.52](https://playwright.dev).
 
 ## Getting started
 
-Use this repository as a [GitHub template](https://github.com/wtchnm/Vitamin/generate) or use [degit](https://github.com/Rich-Harris/degit) to clone to your machine with an empty git history:
+Clone the repository and install dependencies:
 
-```
-npx degit wtchnm/Vitamin#main my-app
-```
-
-Then, install the dependencies:
-
-```
+```bash
+git clone https://github.com/FarisZR/knocker-web.git
+cd knocker-web
 pnpm install
 ```
+
+## Usage
+
+1. **Start the development server**:
+   ```bash
+   pnpm dev
+   ```
+
+2. **Enter your Knocker details**:
+   - Knocker Endpoint URL (e.g., `https://knocker.example.com`)
+   - API Token
+   - (Optional) TTL in seconds
+   - (Optional) IP/CIDR to whitelist
+
+3. **Click "Knock"** to whitelist your IP
+
+Your settings will be saved in the browser session. To enable auto-knock on page load, add `?autoKnock=true` to the URL.
 
 ## Scripts
 
