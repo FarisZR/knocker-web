@@ -35,6 +35,10 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Insert analytics snippet into generated HTML
+        # This runs only in the Actions deployment (the workflow). It is idempotent.
+        run: node ./scripts/add-analytics.js dist/index.html
+
       - name: Deploy to github pages 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
