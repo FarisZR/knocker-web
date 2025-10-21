@@ -2,11 +2,13 @@ import {HttpResponse, http} from 'msw'
 import {vi} from 'vitest'
 import {server} from '../mocks/server'
 import {queryClient, render, screen, waitFor} from '../test-utils'
+import {clearSession, loadSession, saveSession} from '../utils/sessionStorage'
 import {KnockerPage} from './KnockerPage'
 
 beforeEach(() => {
 	sessionStorage.clear()
 	queryClient.clear()
+	clearSession()
 })
 
 describe('KnockerPage', () => {
@@ -64,7 +66,7 @@ describe('KnockerPage', () => {
 		})
 	})
 
-	it('saves inputs to session storage on successful knock', async () => {
+	it('saves inputs to cookie on successful knock', async () => {
 		const {user} = render(<KnockerPage />)
 
 		await user.type(
@@ -79,24 +81,19 @@ describe('KnockerPage', () => {
 			expect(screen.getByText(/success/i)).toBeInTheDocument()
 		})
 
-		const session = JSON.parse(
-			sessionStorage.getItem('knocker_session') || '{}'
-		)
-		expect(session.endpoint).toBe('https://example.com')
-		expect(session.token).toBe('test-token-123')
-		expect(session.ttl).toBe(1800)
+		const session = loadSession()
+		expect(session?.endpoint).toBe('https://example.com')
+		expect(session?.token).toBe('test-token-123')
+		expect(session?.ttl).toBe(1800)
 	})
 
-	it('loads inputs from session storage on mount', () => {
-		sessionStorage.setItem(
-			'knocker_session',
-			JSON.stringify({
-				endpoint: 'https://saved.com',
-				token: 'saved-token',
-				ttl: 7200,
-				ip: '10.0.0.1'
-			})
-		)
+	it('loads inputs from session on mount', () => {
+		saveSession({
+			endpoint: 'https://saved.com',
+			token: 'saved-token',
+			ttl: 7200,
+			ip: '10.0.0.1'
+		})
 
 		render(<KnockerPage />)
 
@@ -109,15 +106,12 @@ describe('KnockerPage', () => {
 	})
 
 	it('automatically knocks on mount when autoKnock query param is present', async () => {
-		sessionStorage.setItem(
-			'knocker_session',
-			JSON.stringify({
-				endpoint: 'https://example.com',
-				token: 'test-token-123',
-				ttl: null,
-				ip: null
-			})
-		)
+		saveSession({
+			endpoint: 'https://example.com',
+			token: 'test-token-123',
+			ttl: null,
+			ip: null
+		})
 
 		render(<KnockerPage />, {route: '/?autoKnock=true'})
 
@@ -158,15 +152,12 @@ describe('KnockerPage', () => {
 	})
 
 	it('toggles auto-knock query parameter when switch is clicked', async () => {
-		sessionStorage.setItem(
-			'knocker_session',
-			JSON.stringify({
-				endpoint: 'https://example.com',
-				token: 'test-token-123',
-				ttl: null,
-				ip: null
-			})
-		)
+		saveSession({
+			endpoint: 'https://example.com',
+			token: 'test-token-123',
+			ttl: null,
+			ip: null
+		})
 
 		const {user} = render(<KnockerPage />, {route: '/?autoKnock=true'})
 

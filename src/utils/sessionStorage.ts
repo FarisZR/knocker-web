@@ -8,7 +8,10 @@ export interface KnockerSession {
 const STORAGE_KEY = 'knocker_session'
 
 function setCookie(name: string, value: string, days: number) {
-	const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString()
+	const expires = new Date(
+		Date.now() + days * 24 * 60 * 60 * 1000
+	).toUTCString()
+	// biome-ignore lint/suspicious/noDocumentCookie: Cookie Store API not yet widely supported; string assignment is intentional
 	document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`
 }
 
@@ -52,12 +55,15 @@ export function clearSession(): void {
 	try {
 		// Delete cookie by setting expiration in past
 		if (typeof document !== 'undefined') {
+			// biome-ignore lint/suspicious/noDocumentCookie: Intentional cookie clearing for compatibility
 			document.cookie = `${STORAGE_KEY}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
 		}
 		// Also remove sessionStorage fallback
 		try {
 			sessionStorage.removeItem(STORAGE_KEY)
-		} catch {}
+		} catch {
+			// intentionally swallow storage errors (graceful degradation)
+		}
 		// biome-ignore lint/suspicious/noEmptyBlockStatements: Intentionally empty - graceful degradation
 	} catch {}
 }

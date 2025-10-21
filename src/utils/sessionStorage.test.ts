@@ -1,12 +1,14 @@
 import {clearSession, loadSession, saveSession} from './sessionStorage'
 
 beforeEach(() => {
+	// Clear both session storage mechanisms between tests
 	sessionStorage.clear()
+	clearSession()
 })
 
 describe('sessionStorage', () => {
 	describe('saveSession', () => {
-		it('saves session to sessionStorage', () => {
+		it('saves session to cookie', () => {
 			const session = {
 				endpoint: 'https://example.com',
 				token: 'test-token',
@@ -16,15 +18,15 @@ describe('sessionStorage', () => {
 
 			saveSession(session)
 
-			const stored = sessionStorage.getItem('knocker_session')
-			expect(stored).toBe(JSON.stringify(session))
+			const loaded = loadSession()
+			expect(loaded).toEqual(session)
 		})
 
 		it('handles save errors gracefully', () => {
-			const setItemSpy = vi
-				.spyOn(sessionStorage, 'setItem')
+			const cookieSetter = vi
+				.spyOn(document, 'cookie', 'set')
 				.mockImplementation(() => {
-					throw new Error('Storage error')
+					throw new Error('Cookie set error')
 				})
 
 			expect(() =>
@@ -36,12 +38,26 @@ describe('sessionStorage', () => {
 				})
 			).not.toThrow()
 
-			setItemSpy.mockRestore()
+			cookieSetter.mockRestore()
 		})
 	})
 
 	describe('loadSession', () => {
-		it('loads session from sessionStorage', () => {
+		it('loads session from cookie when present', () => {
+			const session = {
+				endpoint: 'https://example.com',
+				token: 'test-token',
+				ttl: 3600,
+				ip: '10.0.0.1'
+			}
+
+			saveSession(session)
+
+			const loaded = loadSession()
+			expect(loaded).toEqual(session)
+		})
+
+		it('falls back to sessionStorage when cookie missing', () => {
 			const session = {
 				endpoint: 'https://example.com',
 				token: 'test-token',
@@ -60,14 +76,52 @@ describe('sessionStorage', () => {
 			expect(loaded).toBeNull()
 		})
 
-		it('handles parse errors gracefully', () => {
-			sessionStorage.setItem('knocker_session', 'invalid json')
+		it('loads from sessionStorage when document is undefined (SSR-like)', () => {
+			const session = {
+				endpoint: 'https://example.com',
+				token: 'test-token',
+				ttl: 3600,
+				ip: '10.0.0.1'
+			}
+
+			const originalDoc = globalThis.document
+			try {
+				vi.stubGlobal('document', undefined)
+				sessionStorage.setItem('knocker_session', JSON.stringify(session))
+				const loaded = loadSession()
+				expect(loaded).toEqual(session)
+			} finally {
+				vi.stubGlobal('document', originalDoc)
+			}
+		})
+
+		it('returns null when both document and sessionStorage are undefined', () => {
+			const originalDoc = globalThis.document
+			const originalSS = globalThis.sessionStorage
+			try {
+				vi.stubGlobal('document', undefined)
+				vi.stubGlobal('sessionStorage', undefined)
+				const loaded = loadSession()
+				expect(loaded).toBeNull()
+			} finally {
+				vi.stubGlobal('document', originalDoc)
+				vi.stubGlobal('sessionStorage', originalSS)
+			}
+		})
+
+		it('handles parse errors gracefully (cookie)', () => {
+			// Simulate invalid cookie via setter throwing invalid data on read
+			const getSpy = vi
+				.spyOn(document, 'cookie', 'get')
+				.mockReturnValue('knocker_session=invalid%json')
 
 			const loaded = loadSession()
 			expect(loaded).toBeNull()
+
+			getSpy.mockRestore()
 		})
 
-		it('handles getItem errors gracefully', () => {
+		it('handles getItem errors gracefully (sessionStorage fallback)', () => {
 			const getItemSpy = vi
 				.spyOn(sessionStorage, 'getItem')
 				.mockImplementation(() => {
@@ -82,7 +136,7 @@ describe('sessionStorage', () => {
 	})
 
 	describe('clearSession', () => {
-		it('removes session from sessionStorage', () => {
+		it('removes session from both cookie and sessionStorage', () => {
 			const session = {
 				endpoint: 'https://example.com',
 				token: 'test-token',
@@ -90,12 +144,14 @@ describe('sessionStorage', () => {
 				ip: '10.0.0.1'
 			}
 
+			// Seed both storage mechanisms
 			sessionStorage.setItem('knocker_session', JSON.stringify(session))
+			saveSession(session)
 
 			clearSession()
 
-			const stored = sessionStorage.getItem('knocker_session')
-			expect(stored).toBeNull()
+			expect(sessionStorage.getItem('knocker_session')).toBeNull()
+			expect(loadSession()).toBeNull()
 		})
 
 		it('handles clear errors gracefully', () => {

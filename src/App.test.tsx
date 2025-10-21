@@ -2,8 +2,10 @@ import {HttpResponse, http} from 'msw'
 import {App} from './App'
 import {server} from './mocks/server'
 import {queryClient, render, screen, waitFor} from './test-utils'
+import {clearSession} from './utils/sessionStorage'
 
 beforeEach(() => {
+	clearSession()
 	sessionStorage.clear()
 	queryClient.clear()
 })
