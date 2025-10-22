@@ -53,7 +53,7 @@ pnpm install
 
 3. **Click "Knock"** to whitelist your IP
 
-Your settings will be saved in the browser session. To enable auto-knock on page load, add `?autoKnock=true` to the URL.
+Your settings will be saved in the browser session. To enable auto-knock on page load, enable the "Auto-knock on page load" switch in the UI — the preference is stored in a cookie so it persists across visits to the site root.
 
 ## Scripts
 

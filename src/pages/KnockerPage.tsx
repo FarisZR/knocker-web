@@ -1,12 +1,11 @@
 import {useMutation} from '@tanstack/react-query'
 import {type FormEvent, useEffect, useId, useState} from 'react'
-import {useSearchParams} from 'react-router'
 import {type KnockResponse, knock} from '@/api/knocker'
 import {Head} from '@/components/Head'
 import {loadSession, saveSession} from '@/utils/sessionStorage'
+import {getAutoKnock, setAutoKnock} from '@/utils/cookie'
 
 export function KnockerPage() {
-	const [searchParams, setSearchParams] = useSearchParams()
 	const [endpoint, setEndpoint] = useState('')
 	const [token, setToken] = useState('')
 	const [ttl, setTtl] = useState('')
@@ -71,15 +70,13 @@ export function KnockerPage() {
 			setToken(session.token)
 			setTtl(session.ttl ? String(session.ttl) : '')
 			setIp(session.ip || '')
-			setEnableAutoKnock(session.endpoint !== '' && session.token !== '')
+			setEnableAutoKnock(getAutoKnock() && session.endpoint !== '' && session.token !== '')
 		}
 	}, [])
 
 	// Auto-knock when enabled and data is loaded
 	useEffect(() => {
-		const shouldAutoKnock = searchParams.get('autoKnock') === 'true'
 		if (
-			shouldAutoKnock &&
 			enableAutoKnock &&
 			endpoint &&
 			token &&
@@ -93,7 +90,7 @@ export function KnockerPage() {
 			return () => clearTimeout(timer)
 		}
 		return
-	}, [enableAutoKnock, endpoint, token, searchParams, knockMutation, result])
+	}, [enableAutoKnock, endpoint, token, knockMutation, result])
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault()
@@ -106,13 +103,7 @@ export function KnockerPage() {
 	const handleAutoKnockToggle = () => {
 		const newValue = !enableAutoKnock
 		setEnableAutoKnock(newValue)
-
-		// Update URL params
-		if (newValue) {
-			setSearchParams({autoKnock: 'true'})
-		} else {
-			setSearchParams({})
-		}
+		setAutoKnock(newValue)
 	}
 
 	return (

@@ -113,7 +113,9 @@ describe('KnockerPage', () => {
 			ip: null
 		})
 
-		render(<KnockerPage />, {route: '/?autoKnock=true'})
+		// Use cookie-based auto-knock in tests
+		document.cookie = 'knocker_auto_knock=1'
+		render(<KnockerPage />)
 
 		await waitFor(() => {
 			expect(screen.getByText(/success/i)).toBeInTheDocument()
@@ -159,18 +161,22 @@ describe('KnockerPage', () => {
 			ip: null
 		})
 
-		const {user} = render(<KnockerPage />, {route: '/?autoKnock=true'})
-
+		// Use cookie-based auto-knock in tests
+		document.cookie = 'knocker_auto_knock=1'
+		const {user} = render(<KnockerPage />)
+		
 		const toggle = await screen.findByRole('switch', {
 			name: /auto-knock on page load/i
 		})
-
-		expect(window.location.search).toBe('?autoKnock=true')
+		
+		// Cookie should be set initially
+		expect(document.cookie.includes('knocker_auto_knock=1')).toBe(true)
 		await user.click(toggle)
-		expect(window.location.search).toBe('')
-
+		// Toggle should set cookie value to '0' when disabled
+		expect(document.cookie.includes('knocker_auto_knock=0')).toBe(true)
+		
 		await user.click(toggle)
-		expect(window.location.search).toBe('?autoKnock=true')
+		expect(document.cookie.includes('knocker_auto_knock=1')).toBe(true)
 	})
 
 	it('shows friendly network error message when fetch fails', async () => {
