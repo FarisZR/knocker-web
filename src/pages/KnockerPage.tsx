@@ -2,8 +2,8 @@ import {useMutation} from '@tanstack/react-query'
 import {type FormEvent, useEffect, useId, useState} from 'react'
 import {type KnockResponse, knock} from '@/api/knocker'
 import {Head} from '@/components/Head'
-import {loadSession, saveSession} from '@/utils/sessionStorage'
 import {getAutoKnock, setAutoKnock} from '@/utils/cookie'
+import {loadSession, saveSession} from '@/utils/sessionStorage'
 
 export function KnockerPage() {
 	const [endpoint, setEndpoint] = useState('')
@@ -70,7 +70,9 @@ export function KnockerPage() {
 			setToken(session.token)
 			setTtl(session.ttl ? String(session.ttl) : '')
 			setIp(session.ip || '')
-			setEnableAutoKnock(getAutoKnock() && session.endpoint !== '' && session.token !== '')
+			setEnableAutoKnock(
+				getAutoKnock() && session.endpoint !== '' && session.token !== ''
+			)
 		}
 	}, [])
 

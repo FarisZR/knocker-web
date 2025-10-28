@@ -7,7 +7,9 @@ export function setCookie(name: string, value: string, days: number): void {
 }
 
 export function getCookie(name: string): string | null {
-	const match = document.cookie.split('; ').find(row => row.startsWith(name + '='))
+	const match = document.cookie
+		.split('; ')
+		.find(row => row.startsWith(`${name}=`))
 	if (!match) return null
 	return decodeURIComponent(match.split('=')[1])
 }
