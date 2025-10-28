@@ -114,6 +114,7 @@ describe('KnockerPage', () => {
 		})
 
 		// Use cookie-based auto-knock in tests
+		// biome-ignore lint/suspicious/noDocumentCookie: Direct cookie manipulation is needed for test setup
 		document.cookie = 'knocker_auto_knock=1'
 		render(<KnockerPage />)
 
@@ -162,19 +163,20 @@ describe('KnockerPage', () => {
 		})
 
 		// Use cookie-based auto-knock in tests
+		// biome-ignore lint/suspicious/noDocumentCookie: Direct cookie manipulation is needed for test setup
 		document.cookie = 'knocker_auto_knock=1'
 		const {user} = render(<KnockerPage />)
-		
+
 		const toggle = await screen.findByRole('switch', {
 			name: /auto-knock on page load/i
 		})
-		
+
 		// Cookie should be set initially
 		expect(document.cookie.includes('knocker_auto_knock=1')).toBe(true)
 		await user.click(toggle)
 		// Toggle should set cookie value to '0' when disabled
 		expect(document.cookie.includes('knocker_auto_knock=0')).toBe(true)
-		
+
 		await user.click(toggle)
 		expect(document.cookie.includes('knocker_auto_knock=1')).toBe(true)
 	})
