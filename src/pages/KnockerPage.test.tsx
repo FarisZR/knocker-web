@@ -114,6 +114,7 @@ describe('KnockerPage', () => {
 		})
 
 		// Use cookie-based auto-knock in tests
+		// biome-ignore lint/suspicious/noDocumentCookie: Direct cookie manipulation is needed for test setup
 		document.cookie = 'knocker_auto_knock=1'
 		render(<KnockerPage />)
 
@@ -162,6 +163,7 @@ describe('KnockerPage', () => {
 		})
 
 		// Use cookie-based auto-knock in tests
+		// biome-ignore lint/suspicious/noDocumentCookie: Direct cookie manipulation is needed for test setup
 		document.cookie = 'knocker_auto_knock=1'
 		const {user} = render(<KnockerPage />)
 

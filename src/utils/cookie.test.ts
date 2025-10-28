@@ -8,6 +8,7 @@ import {
 
 beforeEach(() => {
 	// Ensure a clean cookie state between tests
+	// biome-ignore lint/suspicious/noDocumentCookie: Direct cookie manipulation is needed for test setup
 	document.cookie = `${AUTO_KNOCK_COOKIE}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
 })
 
