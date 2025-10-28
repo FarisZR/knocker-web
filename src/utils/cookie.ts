@@ -13,7 +13,7 @@ export function getCookie(name: string): string | null {
 		.find(row => row.startsWith(`${name}=`))
 	if (!match) return null
 	const value = match.split('=')[1]
-	return value ? decodeURIComponent(value) : null
+	return value !== undefined ? decodeURIComponent(value) : null
 }
 
 export function deleteCookie(name: string): void {
